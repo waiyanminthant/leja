@@ -1,0 +1,1 @@
+export const appURL = process.env.APP_URL

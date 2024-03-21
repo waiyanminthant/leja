@@ -10,6 +10,8 @@ import {
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import NavLinks from "@/components/navlinks";
+import { IconChartBubbleFilled } from "@tabler/icons-react";
 
 export default function RootLayout({
   children,
@@ -21,10 +23,10 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <title>Leja</title>
-        <ColorSchemeScript />
+        <ColorSchemeScript/>
       </head>
       <body>
-        <MantineProvider defaultColorScheme="dark">
+        <MantineProvider>
           <AppShell
             header={{ height: 60 }}
             navbar={{
@@ -44,14 +46,19 @@ export default function RootLayout({
                   size="sm"
                 />
                 <Text size="xl" fw="bolder">
+                  <IconChartBubbleFilled
+                    size={20}
+                    style={{ marginRight: 4 }}
+                    stroke={1.5}
+                  />
                   LEJA
                 </Text>
               </Flex>
             </AppShell.Header>
 
-            <AppShell.Navbar p="md">Navbar</AppShell.Navbar>
+            <NavLinks />
 
-            <AppShell.Main>Main</AppShell.Main>
+            <AppShell.Main>{children}</AppShell.Main>
           </AppShell>
         </MantineProvider>
       </body>
