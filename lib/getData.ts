@@ -1,4 +1,5 @@
 export default async function getData(url: string, desc: string) {
+
   const res = await fetch(url, { next: { revalidate: 0 } });
 
   if (!res.ok) {
