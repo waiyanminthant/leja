@@ -36,7 +36,7 @@ export function ExpenseCreateForm() {
     validate: {
       name: (value) =>
         value.length < 3 ? "Item name must be longer than 2 letters" : null,
-      amount: (value) => (value < 0 ? "Production must be greater than 0" : null),
+      amount: (value) => (value < 1 ? "Production must be at least 1" : null),
     },
   });
 
@@ -62,7 +62,7 @@ export function ExpenseCreateForm() {
       <Button variant="filled" leftSection={<IconPlus />} onClick={open}>
         Add
       </Button>
-      <Modal opened={opened} onClose={close} title="Add Expense">
+      <Modal opened={opened} onClose={close} title="Add Production">
         <Container size="sm">
           <form onSubmit={handleSubmit} onReset={formData.reset}>
             <Stack gap="lg">

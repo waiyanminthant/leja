@@ -16,3 +16,24 @@ export interface ProductionItem {
   date: Date,
   toStock: boolean
 }
+
+export interface StockItem {
+  id: string,
+  name: string,
+  amount: number,
+  date: Date,
+  price: number,
+  currency: string,
+  rate: number
+  sold: boolean
+}
+
+export interface SaleItem {
+  name: String,
+  amount: number,
+  date: Date,
+  price: number,
+  currency: String,
+  rate: number,
+  stock: number,
+}

@@ -32,6 +32,13 @@ export default function NavLinks() {
         }
       />
       <NavLink
+        href="/stocks"
+        label="Stocks"
+        leftSection={
+          <IconStack2 size={20} style={{ marginTop: 4 }} stroke={1.5} />
+        }
+      />
+      <NavLink
         href="/sale"
         label="Sale"
         leftSection={

@@ -4,6 +4,7 @@
 import {
   TableTr,
   TableTd,
+  NumberFormatter,
   ActionIcon,
   Table,
   TableThead,
@@ -11,22 +12,23 @@ import {
   TableTbody,
   Badge,
   Skeleton,
+  Flex,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
-import { ProductionItem } from "../interfaces";
+import { StockItem } from "../interfaces";
 import getData from "@/lib/getData";
 import deleteData from "@/lib/deleteData";
 import { Suspense } from "react";
 import { appURL } from "../config";
 
 // Define the itemTable component as an async function
-export async function ProductionTable() {
+export async function StockTable() {
 
   // Fetch items data from the API
-  const items: ProductionItem[] = await getData(
-    `${appURL}/api/production`,
-    "Produced Item"
+  const items: StockItem[] = await getData(
+    `${appURL}/api/stocks`,
+    "Stock Items"
   );
 
   // Function to handle deletion of an item
@@ -34,9 +36,22 @@ export async function ProductionTable() {
     // Confirm deletion with user
     if (window.confirm(`Are you sure you want to delete this item called ${detail}?`)) {
       // If confirmed, call the deleteData function to delete the item
-      deleteData(`/api/production/${id}/delete`)
+      deleteData(`/api/stocks/${id}/delete`)
     }
   };
+
+  function calculateTotal(amount, price, currency, rate) {
+    return (
+      <Flex gap={8} align='center'>
+        <NumberFormatter prefix={currency + " "} value={amount * price} thousandSeparator />
+        {currency != "MMK" ?
+          <Badge size="sm" color="blue">
+            <NumberFormatter prefix="MMK " value={amount * price * rate} thousandSeparator />
+          </Badge>
+          : null}
+      </Flex>
+    )
+  }
 
   // Map items data to table rows
   const rows = items.map((item, index) => (
@@ -44,8 +59,12 @@ export async function ProductionTable() {
       <TableTd>{index + 1}</TableTd>
       <TableTd>{dayjs(item.date).format("DD-MMM-YY")}</TableTd>
       <TableTd>{item.name}</TableTd>
-      <TableTd>{item.amount} {item.unit}</TableTd>
-      <TableTd>{item.toStock? <Badge size="sm" color="blue">Yes</Badge> : <Badge size="sm" color="red">No</Badge>}</TableTd>
+      <TableTd>{item.amount}</TableTd>
+      <TableTd>{item.price}</TableTd>
+      <TableTd>{item.sold ? <Badge color="green">Yes</Badge> : <Badge color="red">No</Badge>}</TableTd>
+      <TableTd>
+        {calculateTotal(item.amount, item.price, item.currency, item.rate)}
+      </TableTd>
       <TableTd>
         <ActionIcon
           variant="subtle"
@@ -64,10 +83,12 @@ export async function ProductionTable() {
       <TableThead>
         <TableTr>
           <TableTh>No.</TableTh>
-          <TableTh>Produced Date</TableTh>
+          <TableTh>Created Date</TableTh>
           <TableTh>Item Name</TableTh>
-          <TableTh>Amount</TableTh>
-          <TableTh>Converted to Stock?</TableTh>
+          <TableTh>Stock Count</TableTh>
+          <TableTh>Price</TableTh>
+          <TableTh>Sold?</TableTh>
+          <TableTh>Total</TableTh>
           <TableTh></TableTh>
         </TableTr>
       </TableThead>

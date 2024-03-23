@@ -25,3 +25,25 @@ model production {
   date     DateTime @db.Date
   toStock  Boolean
 }
+
+model stock {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  amount   Int
+  date     DateTime @db.Date
+  price    Int
+  currency String
+  rate     Int
+  sold     Boolean
+}
+
+model sale {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  amount   Int
+  date     DateTime @db.Date
+  price    Int
+  currency String
+  rate     Int
+  leftover Int
+}

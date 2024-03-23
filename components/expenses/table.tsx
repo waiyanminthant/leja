@@ -14,7 +14,7 @@ import {
   Flex,
   Skeleton,
 } from "@mantine/core";
-import { IconTrash, IconEdit } from "@tabler/icons-react";
+import { IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { Expense } from "../interfaces";
 import getData from "@/lib/getData";

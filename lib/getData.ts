@@ -1,4 +1,4 @@
-export default async function getData(url: string, desc: string) {
+export default async function getData(url: string, desc: string, options?: string) {
 
   const res = await fetch(url, { next: { revalidate: 0 } });
 
