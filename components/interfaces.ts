@@ -4,5 +4,6 @@ export interface Expense {
   type: string,
   amount: number,
   currency: string,
-  date: Date
+  date: Date,
+  rate?: number;
 }

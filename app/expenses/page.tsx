@@ -1,6 +1,5 @@
 import { Container, Divider, Flex, Title } from "@mantine/core";
 import { IconCashBanknoteFilled } from "@tabler/icons-react";
-import { Suspense } from "react";
 import { RenderExpenseForm } from "@/components/expenses/form";
 import { ExpenseTable } from "@/components/expenses/table";
 

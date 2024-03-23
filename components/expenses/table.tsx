@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import deleteData from "@/lib/deleteData";
 import {
@@ -10,11 +10,15 @@ import {
   TableThead,
   TableTh,
   TableTbody,
+  Badge,
+  Flex,
+  Skeleton,
 } from "@mantine/core";
 import { IconTrash, IconEdit } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { Expense } from "../interfaces";
 import getData from "@/lib/getData";
+import { Suspense } from "react";
 
 export async function ExpenseTable() {
   const expenses: Expense[] = await getData(
@@ -22,12 +26,39 @@ export async function ExpenseTable() {
     "expenses"
   );
 
-  const deletehandler = (id: string, detail: string) => {
-    try {
-      deleteData(`/api/expenses/${id}/delete`, detail);
-    } catch (error) {
-      console.error();
+  function currencyCheck(amount: number, currency: string, rate: number) {
+    var Amount = (
+      <NumberFormatter
+        prefix={currency + " "}
+        value={amount}
+        thousandSeparator
+      />
+    );
+
+    if (currency != "MMK") {
+      Amount = (
+        <Flex gap={12} align="center">
+          <NumberFormatter
+            prefix={currency + " "}
+            value={amount}
+            thousandSeparator
+          />
+          <Badge size="xs">
+            <NumberFormatter
+              prefix={"MMK "}
+              value={amount * rate}
+              thousandSeparator
+            />
+          </Badge>
+        </Flex>
+      );
     }
+
+    return Amount;
+  }
+
+  const deletehandler = (id: string, detail: string) => {
+    deleteData(`/api/expenses/${id}/delete`, detail);
   };
 
   // Map expenses data to table rows
@@ -38,11 +69,7 @@ export async function ExpenseTable() {
       <TableTd>{expense.detail}</TableTd>
       <TableTd>{expense.type}</TableTd>
       <TableTd>
-        <NumberFormatter
-          prefix={expense.currency + " "}
-          value={expense.amount}
-          thousandSeparator
-        />
+        {currencyCheck(expense.amount, expense.currency, expense.rate)}
       </TableTd>
       <TableTd>
         <ActionIcon
@@ -72,7 +99,9 @@ export async function ExpenseTable() {
           <TableTh></TableTh>
         </TableTr>
       </TableThead>
-      <TableTbody>{rows}</TableTbody>
+      <Suspense fallback={<Skeleton height={420} radius={12} />}>
+        <TableTbody>{rows}</TableTbody>
+      </Suspense>
     </Table>
   );
 }

@@ -10,6 +10,7 @@ datasource db {
 model expenses {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   amount   Int
+  rate     Int?
   currency String
   date     DateTime @db.Date
   detail   String
