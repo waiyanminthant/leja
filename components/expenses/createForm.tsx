@@ -20,7 +20,7 @@ import submitForm from "@/lib/submitForm";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
-export function RenderExpenseForm() {
+export function ExpenseCreateForm() {
   const [opened, { open, close }] = useDisclosure(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();

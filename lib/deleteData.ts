@@ -1,9 +1,6 @@
 export default async function deleteData(
   api_url: string,
-  detail: string
 ): Promise<void> {
-  alert(`Are you sure you want to delete ${detail} expesne?`);
-
   try {
     const response = await fetch(api_url, {
       method: "DELETE",

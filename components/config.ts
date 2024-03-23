@@ -1,1 +1,1 @@
-export const appURL = process.env.APP_URL
+export const appURL = "http://localhost:3000"

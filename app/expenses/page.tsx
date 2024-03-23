@@ -1,6 +1,6 @@
 import { Container, Divider, Flex, Title } from "@mantine/core";
 import { IconCashBanknoteFilled } from "@tabler/icons-react";
-import { RenderExpenseForm } from "@/components/expenses/form";
+import { ExpenseCreateForm } from "@/components/expenses/createForm";
 import { ExpenseTable } from "@/components/expenses/table";
 
 // Define the ExpensesPage component as an async function
@@ -16,7 +16,7 @@ export default async function ExpensesPage() {
           <IconCashBanknoteFilled size={32} />
           <Title order={3}>Expenses List</Title>
         </Flex>
-        <RenderExpenseForm />
+        <ExpenseCreateForm />
       </Flex>
       {/* Divider */}
       <Divider size="md" h={12} my={12} />

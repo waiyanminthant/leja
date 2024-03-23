@@ -16,3 +16,12 @@ model expenses {
   detail   String
   type     String
 }
+
+model production {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  amount   Int
+  unit     String
+  date     DateTime @db.Date
+  toStock  Boolean
+}

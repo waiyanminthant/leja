@@ -1,12 +1,12 @@
 export default async function submitForm(api_url: string, formData: any, close: () => void): Promise<void> {
   try {
-    const expense = formData.values;
+    const data = formData.values;
     const response = await fetch(api_url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ expense }),
+      body: JSON.stringify({ data }),
     });
 
     if (response.ok) {
