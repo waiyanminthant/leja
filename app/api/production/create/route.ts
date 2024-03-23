@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     // Parse the request body to extract the item data
-    const { item } = await req.json();
+    const { data } = await req.json();
 
     // Check if the item data is missing
-    if (!item) {
+    if (!data) {
       // Return a 400 Bad Request response with an error message
       return new NextResponse("Item data is missing", { status: 400 });
     }
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     // Create the item in the database
     await db.production.create({
       data: {
-        ...item, // Spread the item object for cleaner code
+        ...data, // Spread the item object for cleaner code
       },
     });
 

@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     // Parse the request body to extract the expense data
-    const { expense } = await req.json();
+    const { data } = await req.json();
 
     // Check if the expense data is missing
-    if (!expense) {
+    if (!data) {
       // Return a 400 Bad Request response with an error message
       return new NextResponse("Expense data is missing", { status: 400 });
     }
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     // Create the expense in the database
     await db.expenses.create({
       data: {
-        ...expense, // Spread the expense object for cleaner code
+        ...data, // Spread the expense object for cleaner code
       },
     });
 
