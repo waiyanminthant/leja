@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 // Import necessary components and utilities from Mantine and other libraries
 import {
@@ -12,7 +12,9 @@ import {
   TableTbody,
   Badge,
   Flex,
+  Text,
   Skeleton,
+  Title,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
@@ -24,7 +26,6 @@ import { appURL } from "../config";
 
 // Define the ExpenseTable component as an async function
 export async function ExpenseTable() {
-
   // Fetch expenses data from the API
   const expenses: Expense[] = await getData(
     `${appURL}/api/expenses`,
@@ -56,13 +57,16 @@ export async function ExpenseTable() {
     );
   }
 
-
   // Function to handle deletion of an expense
   const deletehandler = (id: string, detail: string) => {
     // Confirm deletion with user
-    if (window.confirm(`Are you sure you want to delete this expense called ${detail}?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete this expense called ${detail}?`
+      )
+    ) {
       // If confirmed, call the deleteData function to delete the expense
-      deleteData(`/api/expenses/${id}/delete`)
+      deleteData(`/api/expenses/${id}/delete`);
     }
   };
 
@@ -102,9 +106,20 @@ export async function ExpenseTable() {
         </TableTr>
       </TableThead>
       {/* Use Suspense to show a loading skeleton while data is being fetched */}
-      <Suspense fallback={<Skeleton height={420} radius={12} />}>
-        <TableTbody>{rows}</TableTbody>
-      </Suspense>
+      {expenses.length > 0 ? (
+        <Suspense fallback={<Skeleton height={420} radius={12} />}>
+          <TableTbody>{rows}</TableTbody>
+        </Suspense>
+      ) : (
+        <TableTbody>
+          <TableTr>
+            <TableTd colSpan={7}>
+              <Title order={3}>No data found...</Title>
+              <Text>Impossible! Perhaps the archives are imcomplete...</Text>
+            </TableTd>
+          </TableTr>
+        </TableTbody>
+      )}
     </Table>
   );
 }

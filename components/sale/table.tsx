@@ -9,29 +9,26 @@ import {
   Table,
   TableThead,
   TableTh,
-  Text,
   TableTbody,
   Badge,
   Skeleton,
   Flex,
-  Tooltip,
+  RingProgress,
+  Text,
   Title,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
-import { StockItem } from "../interfaces";
+import { SaleItem, StockItem } from "../interfaces";
 import getData from "@/lib/getData";
 import deleteData from "@/lib/deleteData";
 import { Suspense } from "react";
 import { appURL } from "../config";
 
 // Define the itemTable component as an async function
-export async function StockTable() {
+export async function SaleTable() {
   // Fetch items data from the API
-  const items: StockItem[] = await getData(
-    `${appURL}/api/stocks`,
-    "Stock Items"
-  );
+  const items: SaleItem[] = await getData(`${appURL}/api/sale`, "Sales Record");
 
   // Function to handle deletion of an item
   const deletehandler = (id: string, detail: string) => {
@@ -42,7 +39,7 @@ export async function StockTable() {
       )
     ) {
       // If confirmed, call the deleteData function to delete the item
-      deleteData(`/api/stocks/${id}/delete`);
+      deleteData(`/api/sale/${id}/delete`);
     }
   };
 
@@ -55,15 +52,13 @@ export async function StockTable() {
           thousandSeparator
         />
         {currency != "MMK" ? (
-          <Tooltip label={"Pirce per Stock: MMK " + price * rate}>
-            <Badge size="sm" color="blue">
-              <NumberFormatter
-                prefix="MMK "
-                value={amount * price * rate}
-                thousandSeparator
-              />
-            </Badge>
-          </Tooltip>
+          <Badge size="sm" color="blue">
+            <NumberFormatter
+              prefix="MMK "
+              value={amount * price * rate}
+              thousandSeparator
+            />
+          </Badge>
         ) : null}
       </Flex>
     );
@@ -72,22 +67,27 @@ export async function StockTable() {
   // Map items data to table rows
   const rows = items.map((item, index) => (
     <TableTr key={item.id}>
+      <TableTd>{index + 1}</TableTd>
       <TableTd>{dayjs(item.date).format("DD-MMM-YY")}</TableTd>
       <TableTd>{item.name}</TableTd>
-      <TableTd>{item.amount}</TableTd>
+      <TableTd>
+        <Flex align="center" gap={8}>
+          {item.amount} / {item.stock}
+          <RingProgress
+            size={40}
+            thickness={8}
+            sections={[
+              { value: (item.amount / item.stock) * 100, color: "blue" },
+            ]}
+          />
+        </Flex>
+      </TableTd>
       <TableTd>
         <NumberFormatter
           prefix={item.currency + " "}
           value={item.price}
           thousandSeparator
         />
-      </TableTd>
-      <TableTd>
-        {item.sold ? (
-          <Badge color="green">Yes</Badge>
-        ) : (
-          <Badge color="red">No</Badge>
-        )}
       </TableTd>
       <TableTd>
         {calculateTotal(item.amount, item.price, item.currency, item.rate)}
@@ -109,11 +109,11 @@ export async function StockTable() {
     <Table highlightOnHover>
       <TableThead>
         <TableTr>
-          <TableTh>Created Date</TableTh>
+          <TableTh>No.</TableTh>
+          <TableTh>Sale Date</TableTh>
           <TableTh>Item Name</TableTh>
-          <TableTh>Stock Count</TableTh>
+          <TableTh>Sale Amount</TableTh>
           <TableTh>Price</TableTh>
-          <TableTh>Sold?</TableTh>
           <TableTh>Total</TableTh>
           <TableTh></TableTh>
         </TableTr>
