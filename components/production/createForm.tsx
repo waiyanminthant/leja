@@ -57,7 +57,7 @@ export function ExpenseCreateForm() {
       <LoadingOverlay
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
-        loaderProps={{ color: "pink", type: "bars" }}
+        loaderProps={{ color: "blue", type: "bars" }}
       />
       <Button variant="filled" leftSection={<IconPlus />} onClick={open}>
         Add
