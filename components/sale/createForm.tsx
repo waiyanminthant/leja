@@ -36,10 +36,14 @@ export function SaleRecordFrom() {
           const data: StockItem[] = await response.json();
           const options = Object.keys(data).map((key) => ({
             value: data[key].id,
-            label: `${data[key].amount} containers of ${
+            label: `${data[key].amount} packets of ${
               data[key].name
-            } from ${dayjs(data[key].date).format("DD MMM, YYYY")}`,
+            } from ${dayjs(data[key].date).format("DD MMM")}, @ ${
+              data[key].price
+            } ${data[key].currency}`,
             stock: data[key].amount,
+            price: data[key].price,
+            name: data[key].name,
           }));
           setUnsoldOptions(options);
         } else {
@@ -76,6 +80,7 @@ export function SaleRecordFrom() {
             : null,
         amount: (value) => (value < 1 ? "Item must be greater than 0" : null),
         stock: (value) => (value < 1 ? "Item must be greater than 0" : null),
+        rate: (value) => (formData.values.saleData.currency != "MMK" && value === 1 ? "Please enter the exchange rate" : null)
       },
     },
   });
@@ -92,6 +97,23 @@ export function SaleRecordFrom() {
     router.refresh();
     setIsLoading(false);
   };
+
+  function autoFill() {
+    const index = formData.values.stockData.id
+      ? unsoldOptions.findIndex(
+          (item) => item.value === formData.values.stockData.id
+        )
+      : 0;
+    const autoFillData = unsoldOptions[index];
+    console.log(
+      unsoldOptions.findIndex(
+        (item) => item.id === formData.values.stockData.id
+      )
+    );
+    formData.setFieldValue("saleData.name", autoFillData.name);
+    formData.setFieldValue("saleData.price", autoFillData.price);
+    formData.setFieldValue("saleData.stock", autoFillData.stock);
+  }
 
   return (
     <Suspense fallback={<Skeleton height={24} radius={4} />}>
@@ -120,6 +142,7 @@ export function SaleRecordFrom() {
                 data={unsoldOptions}
                 required
               />
+              <Button disabled={formData.values.stockData.id === ''} onClick={() => autoFill()}>Auto Fill</Button>
               <TextInput
                 label="Stock Item Name"
                 name="name"
@@ -148,7 +171,8 @@ export function SaleRecordFrom() {
                 label="Price"
                 name="price"
                 description="Price of a single stock"
-                value={formData.values.saleData.amount}
+                value={formData.values.saleData.price}
+                readOnly
                 {...formData.getInputProps("saleData.price")}
                 required
               />
@@ -181,7 +205,8 @@ export function SaleRecordFrom() {
                         "saleData.stock",
                         unsoldOptions[
                           unsoldOptions.findIndex(
-                            (item) => item.value === formData.values.stockData.id
+                            (item) =>
+                              item.value === formData.values.stockData.id
                           )
                         ].stock
                       )
@@ -193,13 +218,6 @@ export function SaleRecordFrom() {
               <Flex mt={12} justify="space-between">
                 <Button type="reset" variant="outline" color="red">
                   Reset
-                </Button>
-                <Button
-                  onClick={() =>
-                    console.log(formData.values)
-                  }
-                >
-                  Check
                 </Button>
                 <Button type="submit" variant="outline" color="blue">
                   Submit

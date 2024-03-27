@@ -1,3 +1,4 @@
+import StockCards from "@/components/stock/cards";
 import { StockCreateForm } from "@/components/stock/createForm";
 import { StockTable } from "@/components/stock/table";
 import { Container, Divider, Flex, Title } from "@mantine/core";
@@ -12,16 +13,17 @@ export default async function StockPage() {
         <Container fluid>
             {/* Header section with title and item form */}
             <Flex justify="space-between">
-                <Flex gap={12}>
+                <Flex gap={12} mb={20}>
                     <IconStack2 size={32} />
                     <Title order={3}>Stock List</Title>
                 </Flex>
                 <StockCreateForm />
             </Flex>
+            <StockCards />
             {/* Divider */}
             <Divider size="md" h={12} my={12} />
             {/* Container for the table */}
-            <Container fluid>
+            <Container fluid> 
                 <StockTable />
             </Container>
         </Container>

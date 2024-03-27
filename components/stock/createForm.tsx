@@ -76,7 +76,11 @@ export function StockCreateForm() {
           value.length < 3
             ? "Stock item name must be longer than 2 letters"
             : null,
-        amount: (value) => (value < 0 ? "Item must be greater than 0" : null),
+        amount: (value) => (value < 1 ? "Converted item must at least 1" : null),
+        rate: (value) =>
+        formData.values.stockData.currency != "MMK" && value === 1
+          ? "Please enter the exchange rate"
+          : null,
       },
     },
   });

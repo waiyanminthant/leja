@@ -25,6 +25,14 @@ export function ExpenseCreateForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const typeOptions = [
+    { value: "SUM", label: "Single Use Materials" },
+    { value: "MUM", label: "Multi Use Materials" },
+    { value: "EQP", label: "Equipments" },
+    { value: "SUP", label: "Supporting Expenses" },
+    { value: "MSC", label: "Miscellaneous Expenses" },
+  ];
+
   const formData = useForm({
     initialValues: {
       detail: "",
@@ -38,6 +46,10 @@ export function ExpenseCreateForm() {
       detail: (value) =>
         value.length < 3 ? "Detail must be longer than 2 letters" : null,
       type: (value) => (value ? null : "Please Select one"),
+      rate: (value) =>
+        formData.values.currency != "MMK" && value === 1
+          ? "Please enter the exchange rate"
+          : null,
     },
   });
 
@@ -81,7 +93,7 @@ export function ExpenseCreateForm() {
                 description="Please select one"
                 value={formData.values.type}
                 {...formData.getInputProps("type")}
-                data={["SUM", "MUM", "EQP", "SUP", "MSC"]}
+                data={typeOptions}
                 placeholder="Select Expense Type"
                 required
               />
