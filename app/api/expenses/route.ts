@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+
   try {
     const query = req.nextUrl.searchParams.get("days") || 30;
     const lastdays = dayjs(new Date())
