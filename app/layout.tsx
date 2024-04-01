@@ -4,29 +4,17 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
 import {
-  ClerkProvider,
-  SignIn,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
-import {
   AppShell,
   Burger,
-  Button,
   ColorSchemeScript,
   Flex,
   MantineProvider,
   Text,
-  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import NavLinks from "@/components/navlinks";
 import {
-  IconAlertCircle,
-  IconAlertCircleFilled,
   IconChartBubbleFilled,
-  IconLogin,
 } from "@tabler/icons-react";
 
 export default function RootLayout({
