@@ -93,7 +93,7 @@ export function StockCreateForm() {
       await submitForm(`/api/stocks/create`, formData, close);
     }
 
-    router.refresh();
+    location.reload();
     setIsLoading(false);
   };
 

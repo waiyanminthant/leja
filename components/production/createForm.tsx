@@ -48,7 +48,7 @@ export function ExpenseCreateForm() {
       await submitForm(`/api/production/create`, formData, close);
     }
 
-    router.refresh();
+    location.reload();
     setIsLoading(false);
   };
 

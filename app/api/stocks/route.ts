@@ -4,7 +4,11 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     // Retrieve all production items from the database
-    const stocks = await db.stock.findMany();
+    const stocks = await db.stock.findMany({
+      orderBy: {
+        date: "desc",
+      },
+    });
 
     // Return a 200 OK response with the production item data
     return NextResponse.json(stocks, { status: 200 });

@@ -11,24 +11,61 @@ import {
   TableTh,
   TableTbody,
   Badge,
-  Skeleton,
   Flex,
   RingProgress,
   Text,
-  Title,
+  Button,
+  Container,
+  LoadingOverlay,
 } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
-import dayjs from "dayjs";
-import { SaleItem, StockItem } from "../interfaces";
+import { IconReload, IconTrash } from "@tabler/icons-react";
+import { SaleItem } from "../interfaces";
 import getData from "@/lib/getData";
 import deleteData from "@/lib/deleteData";
-import { Suspense } from "react";
+import { useEffect, useState } from "react";
 import { appURL } from "../config";
 
+const dayjs = require("dayjs");
+var isBetween = require("dayjs/plugin/isBetween");
+dayjs.extend(isBetween);
+
 // Define the itemTable component as an async function
-export async function SaleTable() {
+export function SaleTable() {
   // Fetch items data from the API
-  const items: SaleItem[] = await getData(`${appURL}/api/sale`, "Sales Record");
+  // Fetch items data from the API
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fromDate, setFromDate] = useState(dayjs().subtract(7, "day"));
+  const [toDate, setToDate] = useState(dayjs());
+  const [sales, setSales] = useState<SaleItem[]>([]);
+  const [error, setError] = useState<string | null>(null); // New state for handling errors
+
+  useEffect(() => {
+    async function getProduceItems() {
+      setIsLoading(true);
+      setError(null); // Reset error state
+
+      try {
+        const salesData: SaleItem[] = await getData(
+          `${appURL}/api/sale`,
+          "sales items"
+        );
+
+        const filterDate = salesData.filter((item) =>
+          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
+        );
+
+        setSales(filterDate);
+      } catch (error) {
+        setError(
+          "Error fetching expenses. Please refresh the page to try again."
+        ); // Set error message
+      }
+
+      setIsLoading(false);
+    }
+
+    getProduceItems();
+  }, [fromDate, toDate]);
 
   // Function to handle deletion of an item
   const deletehandler = (id: string, detail: string) => {
@@ -65,7 +102,7 @@ export async function SaleTable() {
   }
 
   // Map items data to table rows
-  const rows = items.map((item, index) => (
+  const rows = sales.map((item, index) => (
     <TableTr key={item.id}>
       <TableTd>{index + 1}</TableTd>
       <TableTd>{dayjs(item.date).format("DD-MMM-YY")}</TableTd>
@@ -106,33 +143,41 @@ export async function SaleTable() {
 
   // Return the table component with the rendered rows
   return (
-    <Table highlightOnHover>
-      <TableThead>
-        <TableTr>
-          <TableTh>No.</TableTh>
-          <TableTh>Sale Date</TableTh>
-          <TableTh>Item Name</TableTh>
-          <TableTh>Sale Amount</TableTh>
-          <TableTh>Price</TableTh>
-          <TableTh>Total</TableTh>
-          <TableTh></TableTh>
-        </TableTr>
-      </TableThead>
-      {/* Use Suspense to show a loading skeleton while data is being fetched */}
-      {items.length > 0 ? (
-        <Suspense fallback={<Skeleton height={420} radius={12} />}>
-          <TableTbody>{rows}</TableTbody>
-        </Suspense>
-      ) : (
-        <TableTbody>
+    <Container fluid>
+      <LoadingOverlay
+        visible={isLoading}
+        loaderProps={{ color: "gray", type: "bars" }}
+      />
+      <Table highlightOnHover>
+        <TableThead>
           <TableTr>
-            <TableTd colSpan={7}>
-              <Title order={3}>No data found...</Title>
-              <Text>Impossible! Perhaps the archives are imcomplete...</Text>
-            </TableTd>
+            <TableTh>No.</TableTh>
+            <TableTh>Sale Date</TableTh>
+            <TableTh>Item Name</TableTh>
+            <TableTh>Sale Amount</TableTh>
+            <TableTh>Price</TableTh>
+            <TableTh>Total</TableTh>
+            <TableTh></TableTh>
           </TableTr>
+        </TableThead>
+        {/* Use Suspense to show a loading skeleton while data is being fetched */}
+        <TableTbody>
+          {error ? ( // Display error message if error occurred
+            <TableTd colSpan={6}>
+              <Text c="red">{error}</Text>
+              <Button
+                leftSection={<IconReload stroke={1.5} />}
+                my={8}
+                onClick={() => location.reload()}
+              >
+                Refresh
+              </Button>
+            </TableTd>
+          ) : (
+            rows
+          )}
         </TableTbody>
-      )}
-    </Table>
+      </Table>
+    </Container>
   );
 }

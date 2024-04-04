@@ -19,6 +19,7 @@ import { IconPlus } from "@tabler/icons-react";
 import submitForm from "@/lib/submitForm";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
+import dayjs from "dayjs";
 
 export function ExpenseCreateForm() {
   const [opened, { open, close }] = useDisclosure(false);
@@ -37,7 +38,7 @@ export function ExpenseCreateForm() {
     initialValues: {
       detail: "",
       type: "",
-      date: new Date(),
+      date: dayjs().startOf("day"),
       amount: 0,
       currency: "MMK",
       rate: 1,
@@ -60,8 +61,7 @@ export function ExpenseCreateForm() {
       setIsLoading(true);
       await submitForm(`/api/expenses/create`, formData, close);
     }
-
-    router.refresh();
+    location.reload();
     setIsLoading(false);
   };
 

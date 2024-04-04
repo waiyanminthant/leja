@@ -19,7 +19,6 @@ export default async function StockPage() {
                 </Flex>
                 <StockCreateForm />
             </Flex>
-            <StockCards />
             {/* Divider */}
             <Divider size="md" h={12} my={12} />
             {/* Container for the table */}

@@ -94,7 +94,7 @@ export function SaleRecordFrom() {
       await submitForm(`/api/sale/create`, formData, close);
     }
 
-    router.refresh();
+    location.reload();
     setIsLoading(false);
   };
 

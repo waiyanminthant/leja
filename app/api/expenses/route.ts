@@ -1,21 +1,14 @@
 import { db } from "@/lib/db";
-import dayjs from "dayjs";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
 
   try {
-    const query = req.nextUrl.searchParams.get("days") || 30;
-    const lastdays = dayjs(new Date())
-      .subtract(query as number, "days")
-      .format();
 
     // Retrieve all expenses from the database
     const expenses = await db.expenses.findMany({
-      where: {
-        date: {
-          gte: lastdays,
-        },
+      orderBy: {
+        date: 'desc'
       },
     });
 

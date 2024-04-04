@@ -41,7 +41,7 @@ export default function RootLayout({
             padding="md"
           >
             <AppShell.Header>
-              <Flex justify="space-between" gap={8} mt={12} mx={12}>
+              <Flex justify="flex-start" gap={8} mt={12} mx={12}>
                 <Burger
                   mt={4}
                   opened={opened}
