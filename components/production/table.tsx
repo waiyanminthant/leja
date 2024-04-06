@@ -11,8 +11,6 @@ import {
   TableTbody,
   Badge,
   Text,
-  Skeleton,
-  Title,
   Button,
   Container,
   LoadingOverlay,
@@ -20,7 +18,13 @@ import {
   Flex,
   Paper,
 } from "@mantine/core";
-import { IconCalendarCheck, IconChevronLeft, IconChevronRight, IconReload, IconTrash } from "@tabler/icons-react";
+import {
+  IconCalendarCheck,
+  IconChevronLeft,
+  IconChevronRight,
+  IconReload,
+  IconTrash,
+} from "@tabler/icons-react";
 import { ProductionItem } from "../interfaces";
 import getData from "@/lib/getData";
 import deleteData from "@/lib/deleteData";
@@ -49,16 +53,11 @@ export function ProductionTable() {
 
       try {
         const produceData: ProductionItem[] = await getData(
-          `${appURL}/api/production`,
+          `${appURL}/api/production?from=${fromDate}&to=${toDate}`,
           "produced item"
         );
 
-        const filterDate = produceData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        setProduce(filterDate);
-        console.log(filterDate);
+        setProduce(produceData);
       } catch (error) {
         setError(
           "Error fetching expenses. Please refresh the page to try again."
@@ -116,19 +115,14 @@ export function ProductionTable() {
     </TableTr>
   ));
 
-  function changeWeek(direction: string) {
-    switch (direction) {
-      case "Next":
-        setFromDate(dayjs(fromDate).add(7, "day"));
-        setToDate(dayjs(toDate).add(7, "day"));
-        break;
-
-      case "Prev":
-        setFromDate(dayjs(fromDate).subtract(7, "day"));
-        setToDate(dayjs(toDate).subtract(7, "day"));
-        break;
-    }
-  }
+  const changeWeek = (direction: string) => {
+    setFromDate((prevFromDate) =>
+      dayjs(prevFromDate).add(direction === "Next" ? 7 : -7, "day")
+    );
+    setToDate((prevToDate) =>
+      dayjs(prevToDate).add(direction === "Next" ? 7 : -7, "day")
+    );
+  };
 
   // Return the table component with the rendered rows
   return (

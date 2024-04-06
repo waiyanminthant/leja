@@ -19,20 +19,13 @@ import {
   LoadingOverlay,
   Button,
   TableTfoot,
-  MultiSelect,
   Paper,
-  Title,
   Checkbox,
 } from "@mantine/core";
 import {
-  IconArrowBigRightFilled,
-  IconCactusFilled,
-  IconCalendar,
   IconCalendarCheck,
-  IconCalendarStats,
   IconChevronLeft,
   IconChevronRight,
-  IconFilter,
   IconReload,
   IconTrash,
 } from "@tabler/icons-react";
@@ -53,11 +46,15 @@ export function ExpenseTable() {
     dayjs().startOf("week").subtract(4, "day")
   );
   const [toDate, setToDate] = useState(dayjs().startOf("week").add(2, "day"));
-  const [types, setTypes] = useState(["SUM", "MUM", "SUP", "EQP", "MSC"]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [error, setError] = useState<string | null>(null); // New state for handling errors
-
-  const typeOptions = ["SUM", "MUM", "SUP", "EQP", "MSC"];
+  const [types, setTypes] = useState([
+    { label: "SUM", show: true },
+    { label: "MUM", show: true },
+    { label: "SUP", show: true },
+    { label: "EQP", show: true },
+    { label: "MSC", show: true },
+  ]);
 
   useEffect(() => {
     async function getExpenses() {
@@ -66,43 +63,31 @@ export function ExpenseTable() {
 
       try {
         const expenseData: Expense[] = await getData(
-          `${appURL}/api/expenses`,
+          `${appURL}/api/expenses?from=${fromDate}&to=${toDate}`,
           "expenses"
         );
 
-        const filterDate = expenseData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        const filterType = filterDate.filter((item) =>
-          Object.keys(item).some((type) => types.includes(item.type))
-        );
-
-        setExpenses(filterType);
+        setExpenses(expenseData);
       } catch (error) {
         setError(
           "Error fetching expenses. Please refresh the page to try again."
-        ); // Set error message
+        );
       }
 
       setIsLoading(false);
     }
 
     getExpenses();
-  }, [fromDate, toDate, types]);
+  }, [fromDate, toDate]);
 
-  // Function to format currency based on the currency type and rate
   function currencyCheck(amount: number, currency: string, rate: number) {
-    // Default currency format
     return (
       <Flex gap={12} align="center">
-        {/* Display the original amount with the currency prefix */}
         <NumberFormatter
           prefix={currency + " "}
           value={amount}
           thousandSeparator
         />
-        {/* Display the MMK equivalent amount with the "MMK" prefix if the currency is not MMK */}
         {currency !== "MMK" ? (
           <Badge size="sm">
             <NumberFormatter
@@ -118,22 +103,23 @@ export function ExpenseTable() {
 
   // Function to handle deletion of an expense
   const deletehandler = (id: string, detail: string) => {
-    // Confirm deletion with user
     if (
       window.confirm(
         `Are you sure you want to delete this expense called ${detail}?`
       )
     ) {
-      // If confirmed, call the deleteData function to delete the expense
       deleteData(`/api/expenses/${id}/delete`);
     }
   };
 
-  // Map expenses data to table rows
-  const rows = expenses.map((expense, index) => (
+  const filteredExpenses = expenses.filter((expense) =>
+    types.every((type) => type.show || expense.type !== type.label)
+  );
+
+  const rows = filteredExpenses.map((expense, index) => (
     <TableTr key={expense.id}>
       <TableTd>{index + 1}</TableTd>
-      <TableTd>{dayjs(expense.date).format('ddd, DD MMM YYYY')}</TableTd>
+      <TableTd>{dayjs(expense.date).format("ddd, DD MMM YYYY")}</TableTd>
       <TableTd>{expense.detail}</TableTd>
       <TableTd>{expense.type}</TableTd>
       <TableTd>
@@ -151,29 +137,26 @@ export function ExpenseTable() {
     </TableTr>
   ));
 
-  function calcTotal(data: Expense[]) {
-    var total = 0;
-    for (let i = 0; i < data.length; i++) {
-      total += data[i].amount * data[i].rate;
-    }
-    return total;
-  }
+  const calcTotal = (data: Expense[]) =>
+    data.reduce((total, expense) => total + expense.amount * expense.rate, 0);
 
-  function changeWeek(direction: string) {
-    switch (direction) {
-      case "Next":
-        setFromDate(dayjs(fromDate).add(7, "day"));
-        setToDate(dayjs(toDate).add(7, "day"));
-        break;
+  const changeWeek = (direction: string) => {
+    setFromDate((prevFromDate) =>
+      dayjs(prevFromDate).add(direction === "Next" ? 7 : -7, "day")
+    );
+    setToDate((prevToDate) =>
+      dayjs(prevToDate).add(direction === "Next" ? 7 : -7, "day")
+    );
+  };
 
-      case "Prev":
-        setFromDate(dayjs(fromDate).subtract(7, "day"));
-        setToDate(dayjs(toDate).subtract(7, "day"));
-        break;
-    }
-  }
+  const handleCheckboxChange = (index) => {
+    setTypes((prevTypes) =>
+      prevTypes.map((type, i) =>
+        i === index ? { ...type, show: !type.show } : type
+      )
+    );
+  };
 
-  // Return the table component with the rendered rows
   return (
     <Container fluid>
       <LoadingOverlay
@@ -200,16 +183,18 @@ export function ExpenseTable() {
                 leftSection={<IconCalendarCheck stroke={1.5} />}
                 value={[fromDate, toDate]}
                 type="range"
-                w={{ lg: 300 }}
                 valueFormat="DD MMM YYYY"
               />
-              <MultiSelect
-                variant="filled"
-                leftSection={<IconFilter stroke={1.5} />}
-                data={typeOptions}
-                value={types}
-                onChange={setTypes}
-              />
+              {types.map((type, index) => {
+                return (
+                  <Checkbox
+                    key={index}
+                    label={type.label}
+                    checked={type.show}
+                    onChange={() => handleCheckboxChange(index)}
+                  />
+                );
+              })}
             </Flex>
           </Grid.Col>
           <Grid.Col span={1}>
@@ -236,7 +221,7 @@ export function ExpenseTable() {
           </TableTr>
         </TableThead>
         <TableTbody>
-          {error ? ( // Display error message if error occurred
+          {error ? (
             <TableTd colSpan={6}>
               <Text c="red">{error}</Text>
               <Button
@@ -257,7 +242,9 @@ export function ExpenseTable() {
             <TableTh></TableTh>
             <TableTh></TableTh>
             <TableTh>Total:</TableTh>
-            <TableTh>{calcTotal(expenses).toLocaleString()} MMK</TableTh>
+            <TableTh>
+              {calcTotal(filteredExpenses).toLocaleString()} MMK
+            </TableTh>
             <TableTh></TableTh>
           </TableTr>
         </TableTfoot>

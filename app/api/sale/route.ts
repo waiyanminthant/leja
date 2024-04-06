@@ -1,12 +1,31 @@
 import { db } from "@/lib/db";
+import dayjs from "dayjs";
+import { NextApiRequest } from "next";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextApiRequest) {
+  const url = new URL(req.url);
+  const fromDate = url.searchParams.get("from");
+  const toDate = url.searchParams.get("to");
   try {
     // Retrieve all sold items from the database
     const stocks = await db.sale.findMany({
       orderBy: {
         date: "desc",
+      },
+      where: {
+        AND: [
+          {
+            date: {
+              gte: dayjs(fromDate).toISOString(),
+            },
+          },
+          {
+            date: {
+              lte: dayjs(toDate).toISOString(),
+            },
+          },
+        ],
       },
     });
 

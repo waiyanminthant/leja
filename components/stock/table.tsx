@@ -12,10 +12,8 @@ import {
   Text,
   TableTbody,
   Badge,
-  Skeleton,
   Flex,
   Tooltip,
-  Title,
   Button,
   Container,
   LoadingOverlay,
@@ -30,10 +28,10 @@ import {
   IconReload,
   IconTrash,
 } from "@tabler/icons-react";
-import { ProductionItem, StockItem } from "../interfaces";
+import { StockItem } from "../interfaces";
 import getData from "@/lib/getData";
 import deleteData from "@/lib/deleteData";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { appURL } from "../config";
 import { DatePickerInput } from "@mantine/dates";
 
@@ -59,7 +57,7 @@ export function StockTable() {
 
       try {
         const stockData: StockItem[] = await getData(
-          `${appURL}/api/stocks`,
+          `${appURL}/api/stocks?from=${fromDate}&to=${toDate}`,
           "stock items"
         );
 
@@ -117,12 +115,14 @@ export function StockTable() {
   }
 
   function calcGrandTotal(data: StockItem[]) {
-    var totalSGD = 0;
-    var totalMMK = 0;
-    for (let i = 0; i < data.length; i++) {
-      totalSGD += data[i].amount * data[i].price;
-      totalMMK += data[i].amount * data[i].price * data[i].rate;
-    }
+    const totalSGD = stocks.reduce(
+      (totalSGD, stock) => totalSGD + stock.amount * stock.price,
+      0
+    );
+    const totalMMK = stocks.reduce(
+      (totalMMK, stock) => totalMMK + stock.amount * stock.price * stock.rate,
+      0
+    );
 
     return (
       <Text fz="xs" fw="bold">
@@ -151,7 +151,7 @@ export function StockTable() {
       <TableTd>{dayjs(item.date).format("ddd, DD MMM YYYY")}</TableTd>
       <TableTd>{item.name}</TableTd>
       <TableTd>
-        <Flex gap={4} align='center'>
+        <Flex gap={4} align="center">
           {item.amount}
           <Badge size="xs" color="grape">
             {Math.round((item.amount / item.prodAmt) * 100) / 100} /{" "}
@@ -188,19 +188,14 @@ export function StockTable() {
     </TableTr>
   ));
 
-  function changeWeek(direction: string) {
-    switch (direction) {
-      case "Next":
-        setFromDate(dayjs(fromDate).add(7, "day"));
-        setToDate(dayjs(toDate).add(7, "day"));
-        break;
-
-      case "Prev":
-        setFromDate(dayjs(fromDate).subtract(7, "day"));
-        setToDate(dayjs(toDate).subtract(7, "day"));
-        break;
-    }
-  }
+  const changeWeek = (direction: string) => {
+    setFromDate((prevFromDate) =>
+      dayjs(prevFromDate).add(direction === "Next" ? 7 : -7, "day")
+    );
+    setToDate((prevToDate) =>
+      dayjs(prevToDate).add(direction === "Next" ? 7 : -7, "day")
+    );
+  };
 
   // Return the table component with the rendered rows
   return (
