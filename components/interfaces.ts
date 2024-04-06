@@ -23,6 +23,8 @@ export interface StockItem {
   amount: number;
   date: Date;
   price: number;
+  prodAmt: number;
+  prodUnit: string;
   currency: string;
   rate: number;
   sold: boolean;

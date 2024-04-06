@@ -17,13 +17,23 @@ import {
   Button,
   Container,
   LoadingOverlay,
+  Grid,
+  Paper,
+  TableTfoot,
 } from "@mantine/core";
-import { IconReload, IconTrash } from "@tabler/icons-react";
+import {
+  IconCalendarCheck,
+  IconChevronLeft,
+  IconChevronRight,
+  IconReload,
+  IconTrash,
+} from "@tabler/icons-react";
 import { SaleItem } from "../interfaces";
 import getData from "@/lib/getData";
 import deleteData from "@/lib/deleteData";
 import { useEffect, useState } from "react";
 import { appURL } from "../config";
+import { DatePickerInput } from "@mantine/dates";
 
 const dayjs = require("dayjs");
 var isBetween = require("dayjs/plugin/isBetween");
@@ -34,8 +44,10 @@ export function SaleTable() {
   // Fetch items data from the API
   // Fetch items data from the API
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [fromDate, setFromDate] = useState(dayjs().subtract(7, "day"));
-  const [toDate, setToDate] = useState(dayjs());
+  const [fromDate, setFromDate] = useState(
+    dayjs().startOf("week").subtract(4, "day")
+  );
+  const [toDate, setToDate] = useState(dayjs().startOf("week").add(2, "day"));
   const [sales, setSales] = useState<SaleItem[]>([]);
   const [error, setError] = useState<string | null>(null); // New state for handling errors
 
@@ -105,7 +117,7 @@ export function SaleTable() {
   const rows = sales.map((item, index) => (
     <TableTr key={item.id}>
       <TableTd>{index + 1}</TableTd>
-      <TableTd>{dayjs(item.date).format("DD-MMM-YY")}</TableTd>
+      <TableTd>{dayjs(item.date).format("ddd, DD MMM YYYY")}</TableTd>
       <TableTd>{item.name}</TableTd>
       <TableTd>
         <Flex align="center" gap={8}>
@@ -141,6 +153,32 @@ export function SaleTable() {
     </TableTr>
   ));
 
+  function changeWeek(direction: string) {
+    switch (direction) {
+      case "Next":
+        setFromDate(dayjs(fromDate).add(7, "day"));
+        setToDate(dayjs(toDate).add(7, "day"));
+        break;
+
+      case "Prev":
+        setFromDate(dayjs(fromDate).subtract(7, "day"));
+        setToDate(dayjs(toDate).subtract(7, "day"));
+        break;
+    }
+  }
+
+  function grandTotals() {
+    var totalItemSold = 0;
+    var totalRevenueSGD = 0;
+    var totalRevenueMMK = 0;
+    for (let i = 0; i < sales.length; i++) {
+      totalItemSold += sales[i].amount;
+      totalRevenueSGD += sales[i].amount * sales[i].price;
+      totalRevenueMMK += sales[i].amount * sales[i].price * sales[i].rate;
+    }
+    return { totalItemSold, totalRevenueSGD, totalRevenueMMK };
+  }
+
   // Return the table component with the rendered rows
   return (
     <Container fluid>
@@ -148,6 +186,43 @@ export function SaleTable() {
         visible={isLoading}
         loaderProps={{ color: "gray", type: "bars" }}
       />
+      <Paper shadow="lg" p={12} withBorder mb={12}>
+        <Grid>
+          <Grid.Col span={1}>
+            <ActionIcon
+              size="lg"
+              variant="subtle"
+              color="gray"
+              onClick={() => changeWeek("Prev")}
+            >
+              <IconChevronLeft />
+            </ActionIcon>
+          </Grid.Col>
+          <Grid.Col span={10}>
+            <Flex gap={12} justify="space-around" align="center">
+              <DatePickerInput
+                variant="filled"
+                readOnly
+                leftSection={<IconCalendarCheck stroke={1.5} />}
+                value={[fromDate, toDate]}
+                type="range"
+                w={{ lg: 300 }}
+                valueFormat="DD MMM YYYY"
+              />
+            </Flex>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <ActionIcon
+              size="lg"
+              variant="subtle"
+              color="gray"
+              onClick={() => changeWeek("Next")}
+            >
+              <IconChevronRight />
+            </ActionIcon>
+          </Grid.Col>
+        </Grid>
+      </Paper>
       <Table highlightOnHover>
         <TableThead>
           <TableTr>
@@ -177,6 +252,23 @@ export function SaleTable() {
             rows
           )}
         </TableTbody>
+        <TableTfoot>
+          <TableTr>
+            <TableTh></TableTh>
+            <TableTh></TableTh>
+            <TableTh>Total Sold:</TableTh>
+            <TableTh>
+              {grandTotals().totalItemSold.toLocaleString()} Packets
+            </TableTh>
+            <TableTh>Revenue:</TableTh>
+            <TableTh>
+              <Text fz="xs" fw="bold">
+                {grandTotals().totalRevenueSGD.toLocaleString()} SGD (or) <br />{" "}
+                {grandTotals().totalRevenueSGD.toLocaleString()} MMK
+              </Text>
+            </TableTh>
+          </TableTr>
+        </TableTfoot>
       </Table>
     </Container>
   );

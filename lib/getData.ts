@@ -1,6 +1,6 @@
 export default async function getData(url: string, desc: string, options?: string) {
 
-  const res = await fetch(url, { next: { revalidate: 0 } });
+  const res = await fetch(url, { next: { revalidate: 30 } });
 
   if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary

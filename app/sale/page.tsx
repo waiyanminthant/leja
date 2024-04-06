@@ -1,4 +1,3 @@
-import SaleCards from "@/components/sale/cards";
 import { SaleRecordFrom } from "@/components/sale/createForm";
 import { SaleTable } from "@/components/sale/table";
 import { Container, Divider, Flex, Title } from "@mantine/core";

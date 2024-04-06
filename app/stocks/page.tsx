@@ -1,4 +1,3 @@
-import StockCards from "@/components/stock/cards";
 import { StockCreateForm } from "@/components/stock/createForm";
 import { StockTable } from "@/components/stock/table";
 import { Container, Divider, Flex, Title } from "@mantine/core";

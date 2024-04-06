@@ -133,7 +133,7 @@ export function ExpenseTable() {
   const rows = expenses.map((expense, index) => (
     <TableTr key={expense.id}>
       <TableTd>{index + 1}</TableTd>
-      <TableTd>{dayjs(expense.date).format('DD MMM YYYY')}</TableTd>
+      <TableTd>{dayjs(expense.date).format('ddd, DD MMM YYYY')}</TableTd>
       <TableTd>{expense.detail}</TableTd>
       <TableTd>{expense.type}</TableTd>
       <TableTd>

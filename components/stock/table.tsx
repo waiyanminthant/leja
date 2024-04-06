@@ -21,8 +21,15 @@ import {
   LoadingOverlay,
   TableTfoot,
   Grid,
+  Paper,
 } from "@mantine/core";
-import { IconReload, IconTrash } from "@tabler/icons-react";
+import {
+  IconCalendarCheck,
+  IconChevronLeft,
+  IconChevronRight,
+  IconReload,
+  IconTrash,
+} from "@tabler/icons-react";
 import { ProductionItem, StockItem } from "../interfaces";
 import getData from "@/lib/getData";
 import deleteData from "@/lib/deleteData";
@@ -38,8 +45,10 @@ dayjs.extend(isBetween);
 export function StockTable() {
   // Fetch items data from the API
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [fromDate, setFromDate] = useState(dayjs().subtract(7, "day"));
-  const [toDate, setToDate] = useState(dayjs());
+  const [fromDate, setFromDate] = useState(
+    dayjs().startOf("week").subtract(4, "day")
+  );
+  const [toDate, setToDate] = useState(dayjs().startOf("week").add(2, "day"));
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [error, setError] = useState<string | null>(null); // New state for handling errors
 
@@ -55,7 +64,7 @@ export function StockTable() {
         );
 
         const filterDate = stockData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, 'day', '[]')
+          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
         );
 
         setStocks(filterDate);
@@ -139,9 +148,17 @@ export function StockTable() {
   // Map items data to table rows
   const rows = stocks.map((item) => (
     <TableTr key={item.id}>
-      <TableTd>{dayjs(item.date).format("DD-MMM-YY")}</TableTd>
+      <TableTd>{dayjs(item.date).format("ddd, DD MMM YYYY")}</TableTd>
       <TableTd>{item.name}</TableTd>
-      <TableTd>{item.amount}</TableTd>
+      <TableTd>
+        <Flex gap={4} align='center'>
+          {item.amount}
+          <Badge size="xs" color="grape">
+            {Math.round((item.amount / item.prodAmt) * 100) / 100} /{" "}
+            {item.prodUnit}
+          </Badge>
+        </Flex>
+      </TableTd>
       <TableTd>
         <NumberFormatter
           prefix={item.currency + " "}
@@ -171,6 +188,20 @@ export function StockTable() {
     </TableTr>
   ));
 
+  function changeWeek(direction: string) {
+    switch (direction) {
+      case "Next":
+        setFromDate(dayjs(fromDate).add(7, "day"));
+        setToDate(dayjs(toDate).add(7, "day"));
+        break;
+
+      case "Prev":
+        setFromDate(dayjs(fromDate).subtract(7, "day"));
+        setToDate(dayjs(toDate).subtract(7, "day"));
+        break;
+    }
+  }
+
   // Return the table component with the rendered rows
   return (
     <Container fluid>
@@ -178,22 +209,43 @@ export function StockTable() {
         visible={isLoading}
         loaderProps={{ color: "gray", type: "bars" }}
       />
-      <Grid mb={20}>
-        <Grid.Col span={3}>
-          <DatePickerInput
-            label="Start From: "
-            value={fromDate}
-            onChange={(value) => setFromDate(value)}
-          />
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <DatePickerInput
-            label="Up Until: "
-            value={toDate}
-            onChange={(value) => setToDate(value)}
-          />
-        </Grid.Col>
-      </Grid>
+      <Paper shadow="lg" p={12} withBorder mb={12}>
+        <Grid>
+          <Grid.Col span={1}>
+            <ActionIcon
+              size="lg"
+              variant="subtle"
+              color="gray"
+              onClick={() => changeWeek("Prev")}
+            >
+              <IconChevronLeft />
+            </ActionIcon>
+          </Grid.Col>
+          <Grid.Col span={10}>
+            <Flex gap={12} justify="space-around" align="center">
+              <DatePickerInput
+                variant="filled"
+                readOnly
+                leftSection={<IconCalendarCheck stroke={1.5} />}
+                value={[fromDate, toDate]}
+                type="range"
+                w={{ lg: 300 }}
+                valueFormat="DD MMM YYYY"
+              />
+            </Flex>
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <ActionIcon
+              size="lg"
+              variant="subtle"
+              color="gray"
+              onClick={() => changeWeek("Next")}
+            >
+              <IconChevronRight />
+            </ActionIcon>
+          </Grid.Col>
+        </Grid>
+      </Paper>
       <Table highlightOnHover>
         <TableThead>
           <TableTr>

@@ -18,12 +18,12 @@ model expenses {
 }
 
 model production {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  amount   Int
-  unit     String
-  date     DateTime @db.Date
-  toStock  Boolean
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  amount  Int
+  unit    String
+  date    DateTime @db.Date
+  toStock Boolean
 }
 
 model stock {
@@ -33,6 +33,8 @@ model stock {
   date     DateTime @db.Date
   price    Int
   currency String
+  prodAmt  Int?
+  prodUnit String?
   rate     Int
   sold     Boolean
 }

@@ -80,7 +80,10 @@ export function SaleRecordFrom() {
             : null,
         amount: (value) => (value < 1 ? "Item must be greater than 0" : null),
         stock: (value) => (value < 1 ? "Item must be greater than 0" : null),
-        rate: (value) => (formData.values.saleData.currency != "MMK" && value === 1 ? "Please enter the exchange rate" : null)
+        rate: (value) =>
+          formData.values.saleData.currency != "MMK" && value === 1
+            ? "Please enter the exchange rate"
+            : null,
       },
     },
   });
@@ -92,9 +95,9 @@ export function SaleRecordFrom() {
     if (formData.isValid()) {
       setIsLoading(true);
       await submitForm(`/api/sale/create`, formData, close);
+      location.reload();
     }
 
-    location.reload();
     setIsLoading(false);
   };
 
@@ -125,24 +128,25 @@ export function SaleRecordFrom() {
       <Button variant="filled" leftSection={<IconPlus />} onClick={open}>
         Record Sale
       </Button>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title="Convert production to stock"
-      >
+      <Modal opened={opened} onClose={close} title="Record a Sale">
         <Container size="sm">
           <form onSubmit={handleSubmit} onReset={formData.reset}>
             <Stack gap="lg">
               <Select
-                label="Unconverted Production to convert"
-                name="unconverted"
-                description="Please select the stock you wish to convert"
+                label="Select the stock that was sold"
+                name="soldUnits"
+                description="Please select the stock you wish to mark as sold"
                 value={formData.values.stockData.id}
                 {...formData.getInputProps("stockData.id")}
                 data={unsoldOptions}
                 required
               />
-              <Button disabled={formData.values.stockData.id === ''} onClick={() => autoFill()}>Auto Fill</Button>
+              <Button
+                disabled={formData.values.stockData.id === ""}
+                onClick={() => autoFill()}
+              >
+                Auto Fill
+              </Button>
               <TextInput
                 label="Stock Item Name"
                 name="name"

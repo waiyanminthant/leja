@@ -36,6 +36,9 @@ export function StockCreateForm() {
           const data: ProductionItem[] = await response.json();
           const options = Object.keys(data).map((key) => ({
             value: data[key].id,
+            name: data[key].name,
+            amount: data[key].amount,
+            unit: data[key].unit,
             label: `${data[key].amount} ${data[key].unit} of ${
               data[key].name
             } from ${dayjs(data[key].date).format("DD MMM, YYYY")}`,
@@ -64,10 +67,12 @@ export function StockCreateForm() {
         name: "",
         amount: 0,
         date: new Date(),
+        prodAmt: 0,
+        prodUnit: "",
         price: 0,
         currency: "SGD",
         rate: 1,
-        sold: false
+        sold: false,
       },
     },
     validate: {
@@ -76,11 +81,12 @@ export function StockCreateForm() {
           value.length < 3
             ? "Stock item name must be longer than 2 letters"
             : null,
-        amount: (value) => (value < 1 ? "Converted item must at least 1" : null),
+        amount: (value) =>
+          value < 1 ? "Converted item must at least 1" : null,
         rate: (value) =>
-        formData.values.stockData.currency != "MMK" && value === 1
-          ? "Please enter the exchange rate"
-          : null,
+          formData.values.stockData.currency != "MMK" && value === 1
+            ? "Please enter the exchange rate"
+            : null,
       },
     },
   });
@@ -96,6 +102,18 @@ export function StockCreateForm() {
     location.reload();
     setIsLoading(false);
   };
+
+  function autoFill() {
+    const index = formData.values.productionData.id
+      ? unconvertedOptions.findIndex(
+          (item) => item.value === formData.values.productionData.id
+        )
+      : 0;
+    const autoFillData = unconvertedOptions[index];
+    formData.setFieldValue("stockData.name", autoFillData.name);
+    formData.setFieldValue("stockData.prodAmt", autoFillData.amount);
+    formData.setFieldValue("stockData.prodUnit", autoFillData.unit);
+  }
 
   return (
     <Suspense fallback={<Skeleton height={24} radius={4} />}>
@@ -124,12 +142,35 @@ export function StockCreateForm() {
                 data={unconvertedOptions}
                 required
               />
+              <Button
+                disabled={formData.values.stockData.id === ""}
+                onClick={() => autoFill()}
+              >
+                Auto Fill
+              </Button>
               <TextInput
                 label="Stock Item Name"
                 name="name"
                 description="Name of the converted stock"
                 value={formData.values.stockData.name}
                 {...formData.getInputProps("stockData.name")}
+                required
+              />
+              <NumberInput
+                label="Production Amount"
+                name="prodAmt"
+                description="The amount of production amount that will be converted"
+                value={formData.values.stockData.prodAmt}
+                {...formData.getInputProps("stockData.prodAmt")}
+                required
+              />
+              <Select
+                label="Production Unit"
+                name="prodUnit"
+                description="Please select correct production unit"
+                value={formData.values.stockData.prodUnit}
+                {...formData.getInputProps("stockData.prodUnit")}
+                data={["Viss", "Kilogram", "Gram"]}
                 required
               />
               <DatePickerInput
@@ -176,9 +217,6 @@ export function StockCreateForm() {
               <Flex mt={12} justify="space-between">
                 <Button type="reset" variant="outline" color="red">
                   Reset
-                </Button>
-                <Button onClick={() => console.log(formData.values)}>
-                  Check
                 </Button>
                 <Button type="submit" variant="outline" color="blue">
                   Submit
