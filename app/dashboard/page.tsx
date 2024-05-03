@@ -66,44 +66,29 @@ export default function Dashboard() {
 
       try {
         const expenseData: Expense[] = await getData(
-          `${appURL}/api/expenses`,
+          `${appURL}/api/expenses?from=${fromDate}&to=${toDate}`,
           "expenses"
         );
 
         const stockData: StockItem[] = await getData(
-          `${appURL}/api/stocks`,
+          `${appURL}/api/stocks?from=${fromDate}&to=${toDate}`,
           "stocks"
         );
 
         const salesData: SaleItem[] = await getData(
-          `${appURL}/api/sale`,
+          `${appURL}/api/sale?from=${salesFrom}&to=${salesTo}`,
           "sales"
         );
 
         const productionData: ProductionItem[] = await getData(
-          `${appURL}/api/production`,
+          `${appURL}/api/production?from=${fromDate}&to=${toDate}`,
           "productions"
         );
 
-        const filteredExpense = expenseData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        const filteredStocks = stockData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        const filteredSales = salesData.filter((item) =>
-          dayjs(item.date).isBetween(salesFrom, salesTo, "day", "[]")
-        );
-        const filteredProduction = productionData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        setExpenses(filteredExpense);
-        setStocks(filteredStocks);
-        setSales(filteredSales);
-        setProduction(filteredProduction);
+        setExpenses(expenseData);
+        setStocks(stockData);
+        setSales(salesData);
+        setProduction(productionData);
       } catch (error) {
         setError(
           "Error fetching expenses. Please refresh the page to try again."
@@ -133,6 +118,8 @@ export default function Dashboard() {
         break;
     }
   }
+
+  console.log(sales);
 
   return (
     <Container fluid>

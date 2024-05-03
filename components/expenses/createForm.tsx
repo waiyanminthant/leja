@@ -60,8 +60,8 @@ export function ExpenseCreateForm() {
     if (formData.isValid()) {
       setIsLoading(true);
       await submitForm(`/api/expenses/create`, formData, close);
+      location.reload();
     }
-    location.reload();
     setIsLoading(false);
   };
 

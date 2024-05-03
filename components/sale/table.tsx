@@ -58,7 +58,7 @@ export function SaleTable() {
 
       try {
         const salesData: SaleItem[] = await getData(
-          `${appURL}/api/sale`,
+          `${appURL}/api/sale?from=${fromDate}&to=${toDate}`,
           "sales items"
         );
 
@@ -264,7 +264,7 @@ export function SaleTable() {
             <TableTh>
               <Text fz="xs" fw="bold">
                 {grandTotals().totalRevenueSGD.toLocaleString()} SGD (or) <br />{" "}
-                {grandTotals().totalRevenueSGD.toLocaleString()} MMK
+                {grandTotals().totalRevenueMMK.toLocaleString()} MMK
               </Text>
             </TableTh>
           </TableTr>
