@@ -15,6 +15,7 @@ import {
   Button,
   Paper,
   Checkbox,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconCalendarCheck,
@@ -40,6 +41,10 @@ export function ExpenseTable() {
     dayjs().startOf("week").subtract(4, "day")
   );
   const [toDate, setToDate] = useState(dayjs().startOf("week").add(2, "day"));
+  const [salesFrom, setSalesFrom] = useState(
+    dayjs().endOf("week").subtract(1, "day")
+  );
+  const [salesTo, setSalesTo] = useState(dayjs().endOf("week").add(1, "day"));
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [error, setError] = useState<string | null>(null); // New state for handling errors
   const [types, setTypes] = useState([
@@ -171,14 +176,16 @@ export function ExpenseTable() {
           </Grid.Col>
           <Grid.Col span={10}>
             <Flex gap={12} justify="space-around" align="center">
-              <DatePickerInput
-                variant="filled"
-                readOnly
-                leftSection={<IconCalendarCheck stroke={1.5} />}
-                value={[fromDate, toDate]}
-                type="range"
-                valueFormat="DD MMM YYYY"
-              />
+              <Tooltip label={`For the sale of ${dayjs(salesFrom).format('DD MMM')} to ${dayjs(salesTo).format('DD MMM')}`}>
+                <DatePickerInput
+                  variant="filled"
+                  readOnly
+                  leftSection={<IconCalendarCheck stroke={1.5} />}
+                  value={[fromDate, toDate]}
+                  type="range"
+                  valueFormat="DD MMM YYYY"
+                />
+              </Tooltip>
               {types.map((type, index) => {
                 return (
                   <Checkbox

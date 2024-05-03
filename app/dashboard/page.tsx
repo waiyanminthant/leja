@@ -51,25 +51,10 @@ export default function Dashboard() {
           "productions"
         );
 
-        const filteredExpense = expenseData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        const filteredStocks = stockData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        const filteredSales = salesData.filter((item) =>
-          dayjs(item.date).isBetween(salesFrom, salesTo, "day", "[]")
-        );
-        const filteredProduction = productionData.filter((item) =>
-          dayjs(item.date).isBetween(fromDate, toDate, "day", "[]")
-        );
-
-        setExpenses(filteredExpense);
-        setStocks(filteredStocks);
-        setSales(filteredSales);
-        setProduction(filteredProduction);
+        setExpenses(expenseData);
+        setStocks(stockData);
+        setSales(salesData);
+        setProduction(productionData);
       } catch (error) {
         setError(
           "Error fetching expenses. Please refresh the page to try again."
@@ -99,6 +84,8 @@ export default function Dashboard() {
         break;
     }
   }
+
+  console.log(sales);
 
   return (
     <Container fluid>
