@@ -3,14 +3,9 @@
 // Import necessary components and utilities from Mantine and other libraries
 import React, { useState, useEffect } from "react";
 import {
-  TableTr,
-  TableTd,
   NumberFormatter,
   ActionIcon,
   Table,
-  TableThead,
-  TableTh,
-  TableTbody,
   Badge,
   Flex,
   Container,
@@ -18,7 +13,6 @@ import {
   Text,
   LoadingOverlay,
   Button,
-  TableTfoot,
   Paper,
   Checkbox,
 } from "@mantine/core";
@@ -117,15 +111,15 @@ export function ExpenseTable() {
   );
 
   const rows = filteredExpenses.map((expense, index) => (
-    <TableTr key={expense.id}>
-      <TableTd>{index + 1}</TableTd>
-      <TableTd>{dayjs(expense.date).format("ddd, DD MMM YYYY")}</TableTd>
-      <TableTd>{expense.detail}</TableTd>
-      <TableTd>{expense.type}</TableTd>
-      <TableTd>
+    <Table.Tr key={expense.id}>
+      <Table.Td>{index + 1}</Table.Td>
+      <Table.Td>{dayjs(expense.date).format("ddd, DD MMM YYYY")}</Table.Td>
+      <Table.Td>{expense.detail}</Table.Td>
+      <Table.Td>{expense.type}</Table.Td>
+      <Table.Td>
         {currencyCheck(expense.amount, expense.currency, expense.rate)}
-      </TableTd>
-      <TableTd>
+      </Table.Td>
+      <Table.Td>
         <ActionIcon
           variant="subtle"
           color="red"
@@ -133,8 +127,8 @@ export function ExpenseTable() {
         >
           <IconTrash size={16} />
         </ActionIcon>
-      </TableTd>
-    </TableTr>
+      </Table.Td>
+    </Table.Tr>
   ));
 
   const calcTotal = (data: Expense[]) =>
@@ -210,19 +204,19 @@ export function ExpenseTable() {
         </Grid>
       </Paper>
       <Table highlightOnHover withTableBorder>
-        <TableThead>
-          <TableTr>
-            <TableTh>No.</TableTh>
-            <TableTh>Transaction Date</TableTh>
-            <TableTh>Detail</TableTh>
-            <TableTh>Type</TableTh>
-            <TableTh>Amount</TableTh>
-            <TableTh></TableTh>
-          </TableTr>
-        </TableThead>
-        <TableTbody>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>No.</Table.Th>
+            <Table.Th>Transaction Date</Table.Th>
+            <Table.Th>Detail</Table.Th>
+            <Table.Th>Type</Table.Th>
+            <Table.Th>Amount</Table.Th>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
           {error ? (
-            <TableTd colSpan={6}>
+            <Table.Td colSpan={6}>
               <Text c="red">{error}</Text>
               <Button
                 leftSection={<IconReload stroke={1.5} />}
@@ -231,23 +225,23 @@ export function ExpenseTable() {
               >
                 Refresh
               </Button>
-            </TableTd>
+            </Table.Td>
           ) : (
             rows
           )}
-        </TableTbody>
-        <TableTfoot>
-          <TableTr>
-            <TableTh></TableTh>
-            <TableTh></TableTh>
-            <TableTh></TableTh>
-            <TableTh>Total:</TableTh>
-            <TableTh>
+        </Table.Tbody>
+        <Table.Tfoot>
+          <Table.Tr>
+            <Table.Th></Table.Th>
+            <Table.Th></Table.Th>
+            <Table.Th></Table.Th>
+            <Table.Th>Total:</Table.Th>
+            <Table.Th>
               {calcTotal(filteredExpenses).toLocaleString()} MMK
-            </TableTh>
-            <TableTh></TableTh>
-          </TableTr>
-        </TableTfoot>
+            </Table.Th>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Tfoot>
       </Table>
     </Container>
   );

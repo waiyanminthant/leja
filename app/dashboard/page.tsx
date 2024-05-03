@@ -1,40 +1,13 @@
 "use client";
 
 import { appURL } from "@/components/config";
-import {
-  ActualProfit,
-  ExpenseTotalCard,
-  PotentialProfit,
-  PotentialRevenueCard,
-  TotalRevenueCard,
-  TotalStockCard,
-} from "@/components/cards";
-import {
-  Expense,
-  ProductionItem,
-  SaleItem,
-  StockItem,
-} from "@/components/interfaces";
-import getData from "@/lib/getData";
-import {
-  ActionIcon,
-  Badge,
-  Container,
-  Divider,
-  Flex,
-  Grid,
-  LoadingOverlay,
-  Paper,
-  Title,
-} from "@mantine/core";
-import {
-  IconArrowBigRightFilled,
-  IconCalendarStats,
-  IconChevronLeft,
-  IconChevronRight,
-  IconHome2,
-} from "@tabler/icons-react";
+import { ActualProfit, ExpenseTotalCard, PotentialProfit, PotentialRevenueCard, TotalRevenueCard, TotalStockCard, } from "@/components/cards";
+import { Expense, ProductionItem, SaleItem, StockItem, } from "@/components/interfaces";
+import { Container, Divider, Flex, Grid, LoadingOverlay, Title, } from "@mantine/core";
+import { IconHome2 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import { renderDashboardController } from "@/components/controller";
+import getData from "@/lib/getData";
 
 const dayjs = require("dayjs");
 var isBetween = require("dayjs/plugin/isBetween");
@@ -42,17 +15,10 @@ dayjs.extend(isBetween);
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const [fromDate, setFromDate] = useState(
-    dayjs().startOf("week").subtract(4, "day")
-  );
+  const [fromDate, setFromDate] = useState(dayjs().startOf("week").subtract(4, "day"));
   const [toDate, setToDate] = useState(dayjs().startOf("week").add(2, "day"));
-
-  const [salesFrom, setSalesFrom] = useState(
-    dayjs().endOf("week").subtract(1, "day")
-  );
+  const [salesFrom, setSalesFrom] = useState(dayjs().endOf("week").subtract(1, "day"));
   const [salesTo, setSalesTo] = useState(dayjs().endOf("week").add(1, "day"));
-
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [sales, setSales] = useState<SaleItem[]>([]);
@@ -66,22 +32,22 @@ export default function Dashboard() {
 
       try {
         const expenseData: Expense[] = await getData(
-          `${appURL}/api/expenses`,
+          `${appURL}/api/expenses?from=${fromDate}&to=${toDate}`,
           "expenses"
         );
 
         const stockData: StockItem[] = await getData(
-          `${appURL}/api/stocks`,
+          `${appURL}/api/stocks?from=${fromDate}&to=${toDate}`,
           "stocks"
         );
 
         const salesData: SaleItem[] = await getData(
-          `${appURL}/api/sale`,
+          `${appURL}/api/sale?from=${salesFrom}&to=${salesTo}`,
           "sales"
         );
 
         const productionData: ProductionItem[] = await getData(
-          `${appURL}/api/production`,
+          `${appURL}/api/production?from=${fromDate}&to=${toDate}`,
           "productions"
         );
 
@@ -145,54 +111,7 @@ export default function Dashboard() {
         <Title order={3}>Business Overview</Title>
       </Flex>
       <Divider size="md" h={12} mt={12} />
-      <Paper shadow="lg" withBorder p={20} mb={12}>
-        <Grid>
-          <Grid.Col span={1}>
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              onClick={() => changeWeek("Prev")}
-            >
-              <IconChevronLeft />
-            </ActionIcon>
-          </Grid.Col>
-          <Grid.Col span={5}>
-            <Flex gap={12} justify="center" align="center">
-              <Title order={6}>Showing Expenses:</Title>
-              <Badge
-                leftSection={<IconCalendarStats size={16} />}
-                color="violet"
-              >
-                {dayjs(fromDate).format("DD-MMM-YYYY")}{" "}
-                <IconArrowBigRightFilled size={8} />{" "}
-                {dayjs(toDate).format("DD-MMM-YYYY")}
-              </Badge>
-            </Flex>
-          </Grid.Col>
-          <Grid.Col span={5}>
-            <Flex gap={12} justify="center" align="center">
-              <Title order={6}>Showing Revenue:</Title>
-              <Badge
-                leftSection={<IconCalendarStats size={16} />}
-                color="indigo"
-              >
-                {dayjs(salesFrom).format("DD-MMM-YYYY")}{" "}
-                <IconArrowBigRightFilled size={8} />{" "}
-                {dayjs(salesTo).format("DD-MMM-YYYY")}
-              </Badge>
-            </Flex>
-          </Grid.Col>
-          <Grid.Col span={1}>
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              onClick={() => changeWeek("Next")}
-            >
-              <IconChevronRight />
-            </ActionIcon>
-          </Grid.Col>
-        </Grid>
-      </Paper>
+      {renderDashboardController(changeWeek, fromDate, toDate, salesFrom, salesTo)}
       {/* cards section */}
       <Grid>
         <Grid.Col span={4}>{ExpenseTotalCard(expenses)}</Grid.Col>
